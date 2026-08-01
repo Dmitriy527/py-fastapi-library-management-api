@@ -1,4 +1,4 @@
-from _pydatetime import date
+from datetime import date
 from sqlalchemy import Date
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -23,4 +23,4 @@ class DBBook(Base):
     summary: Mapped[str] = mapped_column(String(1000), nullable=False)
     publication_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("author.id"))
-    cheese_type: Mapped["DBAuthor"] = relationship(back_populates="books")
+    author: Mapped["DBAuthor"] = relationship(back_populates="books")
