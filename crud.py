@@ -7,8 +7,14 @@ import models
 import schemas
 
 
-def get_all_authors(db: Session) -> Sequence[models.DBAuthor]:
-    return db.scalars(select(models.DBAuthor)).all()
+def get_all_authors(db: Session, skip: int = 0, limit: int = 10) -> Sequence[models.DBAuthor]:
+    stmt = select(models.DBAuthor).offset(skip).limit(limit)
+    return db.scalars(stmt).all()
+
+
+def get_author_by_id(db: Session, author_id: int) -> models.DBAuthor | None:
+    return db.get(models.DBAuthor, author_id)
+
 
 def create_author(db: Session, author: schemas.AuthorCreate) -> models.DBAuthor:
     db_author = models.DBAuthor(
@@ -20,8 +26,19 @@ def create_author(db: Session, author: schemas.AuthorCreate) -> models.DBAuthor:
     db.refresh(db_author)
     return db_author
 
-def get_all_books(db: Session) -> Sequence[models.DBBook]:
-    return db.scalars(select(models.DBBook)).all()
+
+def get_all_books(
+    db: Session,
+    skip: int = 0,
+    limit: int = 10,
+    author_id: int | None = None,
+) -> Sequence[models.DBBook]:
+    stmt = select(models.DBBook)
+    if author_id is not None:
+        stmt = stmt.where(models.DBBook.author_id == author_id)
+    stmt = stmt.offset(skip).limit(limit)
+    return db.scalars(stmt).all()
+
 
 def create_book(db: Session, book: schemas.BookCreate) -> models.DBBook:
     db_book = models.DBBook(
